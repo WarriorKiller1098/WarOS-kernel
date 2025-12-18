@@ -1,27 +1,36 @@
 # The WarOS kernel, made by WarriorKiller1098
 # Features: about, shutdown, print <>, panic <>
-# This is prototype 1, so there are small bugs laying around
+# This is prototype 5, so there are small bugs laying around
 
-print(" _    _            _____ _____ ")
-print("| |  | |          |  _  /  ___|")
-print("| |  | | __ _ _ __| | | \\ `--. ")
-print("| |/\\| |/ _` | '__| | | |`--. \\")
-print("\\  /\\  / (_| | |  \\ \\_/ /\\__/ /")
-print(" \\/  \\/ \\__,_|_|   \\___/\\____/ ")
-print("")
+import time
+import os
 
-buildnum = 1
-print("WarOS prototype " + str(buildnum) + ", do not enter numbers.")
-print("")
-print("Enter 'help' for more info.")
+buildnum = 5
+
+def boot():
+	print(" _    _            _____ _____ ")
+	print("| |  | |          |  _  /  ___|")
+	print("| |  | | __ _ _ __| | | \\ `--. ")
+	print("| |/\\| |/ _` | '__| | | |`--. \\")
+	print("\\  /\\  / (_| | |  \\ \\_/ /\\__/ /")
+	print(" \\/  \\/ \\__,_|_|   \\___/\\____/ ")
+	print("")
+	time.sleep(1.5)
+	print("WarOS prototype " +
+	str(buildnum))
+	print("")
+	print("Enter 'help' for more info.")
+
+def color_blue():
+	print("\033[44m\033[97m\033[2J\033[H", end="")
+boot()
+
 while True:
     cinput = input("kernel:>").strip()
     if cinput == "about":
         print("WarOS, prototype " + str(buildnum))
     elif cinput == "shutdown":
-        print("Shutting down", end="")
-        for i in range(3):
-            print(".", end="")
+        print("Shutting down..", end="")
         break
     elif cinput.startswith("print"):
         text = cinput[len("print"):]
@@ -32,14 +41,38 @@ while True:
     elif cinput == "help":
         print("'<>' stands for something you'll write.")
         print("Commands are:")
-        print("about, shutdown, print <>, panic <>")
+        print("about, shutdown, print <>, panic <>, blue, clear <>")
     elif cinput.startswith("panic"):
         paniclog = cinput[len("panic"):]
+        color_blue()
+        os.system("cls" if os.name == "nt" else "clear")
+        print("\n\t:(")
         print("")
         print("KernelPanic")
         print("The WarOS kernel has panicked!")
+        print("Please restart WarOS kernel. Fatal error has happened.. :(")
         if paniclog != "":
             print("Error code:" + paniclog)
-        break
+        else:
+        	print("Kernel panic happened with unknown error code.")
+        while True:
+        	time.sleep(1)
+    elif cinput.startswith("clear"):
+    	parts = cinput.split()
+    	args = parts[1:]
+    	if "--help" in args:
+    		print("By default it waits 1 second. use 'clear notime' to remove waiting")
+    		time.sleep(2)
+    		continue
+    	print("Clearing.. (use --help to get help.)")
+    	if "notime" not in args:
+    		time.sleep(1)
+    	os.system("cls" if os.name == "nt" else "clear")
+    	boot()
+    elif cinput == "blue":
+    	color_blue()
+    	print("Colored screen to blue.")
+    elif cinput == "":
+    	print("Nothing has been entered.")
     else:
-        print("Command " + cinput + " does not exist")
+        print("Command " + cinput + " does not exist.")
