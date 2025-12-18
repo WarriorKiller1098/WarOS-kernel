@@ -59,7 +59,7 @@ while True:
         print("'<>' stands for something you'll write.")
         print("Commands are:")
         print("about, shutdown, print <>, panic <>,")
-        print("color <>, clear <>, reset")
+        print("color <>, clear <>, reset, ping")
         print("")
         print("Updates:")
         print("Blue command now is a argument in color command, in prototype 10")
