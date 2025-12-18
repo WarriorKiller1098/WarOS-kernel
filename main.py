@@ -1,6 +1,6 @@
 # The WarOS kernel, made by WarriorKiller1098
 # Features: about, shutdown, print <>, panic <>
-# This is prototype 5, so there are small bugs laying around
+# This is prototype 10, so there are small bugs laying around
 
 import time
 import os
