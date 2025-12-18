@@ -1,12 +1,18 @@
 # The WarOS kernel, made by WarriorKiller1098
 # Features: about, shutdown, print <>, panic <>
-# This is prototype 15, so there are small bugs laying around
+# This is prototype 20, so there are small bugs laying around
 
 import requests
 import time
 import os
 
-buildnum = 15
+buildnum = 20
+
+root = os.path.dirname(os.path.abspath(__file__))
+
+systemd = os.path.join(root, "System")
+appsd = os.path.join(root, "Apps")
+usersd = os.path.join(root, "Users")
 
 def boot(waiting):
 	print(" _    _            _____ _____ ")
@@ -28,6 +34,12 @@ def color_blue():
 	print("\033[44m\033[97m\033[2J\033[H", end="")
 boot(True)
 
+def init_filesystem():
+	for folder in [systemd, appsd, usersd]:
+		if not os.path.exists(folder):
+			os.makedirs(folder)
+			
+init_filesystem()
 def ping(host):
 	try:
 		start = time.time()
@@ -35,7 +47,7 @@ def ping(host):
 		req = requests.get(hosturl, timeout=4)
 		end = time.time()
 		latency = int((end - start) * 1000)
-		print(f"Reply from {host}: status={req.status_code}, time={latency}ms")
+		print(f"Reply from {host}: status={req.status_code}, time={latency}ms, response={req.text}")
 	except requests.exceptions.Timeout:
 		print(f"Ping timed out.")
 	except requests.exceptions.ConnectionError:
@@ -60,6 +72,7 @@ while True:
         print("Commands are:")
         print("about, shutdown, print <>, panic <>,")
         print("color <>, clear <>, reset, ping")
+        print("crt, edt, del")
         print("")
         print("Updates:")
         print("Blue command now is a argument in color command, in prototype 10")
@@ -116,5 +129,103 @@ while True:
     		print("Please enter a URL/IP after 'ping'.")
     	else:
     		ping(parts[1])
+    elif cinput.startswith("crt"):
+    	args = cinput.split()[1:]
+    	if not args:
+    		print("Please enter a filename after 'crt'.")
+    		time.sleep(1)
+    		continue
+    	else:
+    		file_name = args[0]
+    		file_path = os.path.join(usersd, file_name)
+    		if os.path.exists(file_path):
+    			print("Overwriting is not supported.")
+    		else:
+    			with open(file_path, "w") as f:
+    				f.write("This was written by WarOS.")
+    elif cinput.startswith("edt"):
+    	editparts = cinput.split()
+    	
+    	if len(editparts) < 2:
+    		print("To edit, please enter a file path after 'edt'. ")
+    		time.sleep(1)
+    		continue
+    	
+    	file_name = editparts[1]
+    	file_path = os.path.join(usersd, file_name)
+    	
+    	if not os.path.exists(file_path):
+    		print("File does not exist!")
+    		time.sleep(1)
+    		continue
+    	else:
+    		print("\033[44m\033[97m\033[2J\033[H", end="")
+    		os.system("cls" if os.name == "nt" else "clear")
+    		print("WarEdit 1.0 | Editing '" + file_name + "'")
+    		print("------Enter $+ to save and exit.")
+    		with open(file_path, "r") as f:
+    			old_lines = f.read().splitlines()
+    			print("")
+    			print("----old lines--------")
+    			for line in old_lines:
+    				print(line)
+    			print("---------------------------")
+    			print("")
+    			new_lines = []
+    			save_line = "$+"
+    			
+    			while True:
+    				line = input("")
+    				if line == save_line:
+    					break
+    				new_lines.append(line)
+    			
+    			with open(file_path, "w") as f:
+    				f.write("\n".join(new_lines) + "\n")
+    			os.system("cls" if os.name == "nt" else "clear")
+    			print("\033[0m", end="")
+    			os.system("cls" if os.name ==
+    			"nt" else "clear")
+    			boot(False)
+    			os.system("cls" if os.name ==
+    			"nt" else "clear")
+    			boot(True)
+    			print("File is updated successfully!")
+    elif cinput == "ldir":
+    	try:
+    		files = os.listdir(usersd)
+    		if not files:
+    			print("Directory 'Users' is empty!")
+    		else:
+    			print("Users---------------")
+    			for f in files:
+    				print("File - '" + f + "'")
+    	except Exception as e:
+    		print("Failed to list directory: " + e)
+    elif cinput.startswith("del"):
+    	parts = cinput.split()
+    	
+    	if len(parts) < 2:
+    		print("Enter a filename after 'del'.")
+    		time.sleep(1)
+    		continue
+    	
+    	file_name = parts[1]
+    	file_path = os.path.join(usersd, file_name)
+    	
+    	if not os.path.exists(file_path):
+    		print("File does not exist.")
+    		time.sleep(1)
+    		continue
+    	
+    	confirmation = input("Are you sure you want to delete '" + file_name + "'? (y/n)")
+    	if confirmation == "y":
+    		try:
+    			os.remove(file_path)
+    			print("File has been deleted!")
+    		except Exception as e:
+    			print("Failed to delete" + file_name + ":" + e)
+    	else:
+    		print("Deletion was cancelled.")
     else:
         print("Command '" + cinput + "' does not exist.")
