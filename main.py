@@ -1,11 +1,12 @@
 # The WarOS kernel, made by WarriorKiller1098
 # Features: about, shutdown, print <>, panic <>
-# This is prototype 10, so there are small bugs laying around
+# This is prototype 15, so there are small bugs laying around
 
+import requests
 import time
 import os
 
-buildnum = 10
+buildnum = 15
 
 def boot(waiting):
 	print(" _    _            _____ _____ ")
@@ -13,7 +14,7 @@ def boot(waiting):
 	print("| |  | | __ _ _ __| | | \\ `--. ")
 	print("| |/\\| |/ _` | '__| | | |`--. \\")
 	print("\\  /\\  / (_| | |  \\ \\_/ /\\__/ /")
-	print(" \\/  \\/ \\__,_|_|   \\___/\\____/ ")
+	print(" \\/  \\/ \\__,_|_|   \\___/\\____/ prototype " + str(buildnum))
 	print("")
 	print("Loading WarOS......")
 	if waiting == True:
@@ -27,6 +28,20 @@ def color_blue():
 	print("\033[44m\033[97m\033[2J\033[H", end="")
 boot(True)
 
+def ping(host):
+	try:
+		start = time.time()
+		hosturl = host if host.startswith("http") else f"https://{host}"
+		req = requests.get(hosturl, timeout=4)
+		end = time.time()
+		latency = int((end - start) * 1000)
+		print(f"Reply from {host}: status={req.status_code}, time={latency}ms")
+	except requests.exceptions.Timeout:
+		print(f"Ping timed out.")
+	except requests.exceptions.ConnectionError:
+		print(f"Cannot reach {host}.")
+	except Exception as e:
+		print(f"Ping failed! :(: {e}")
 while True:
     cinput = input("kernel:>").strip()
     if cinput == "about":
@@ -95,5 +110,11 @@ while True:
     	boot(False)
     	os.system("cls" if os.name == "nt" else "clear")
     	boot(True)
+    elif cinput.startswith("ping"):
+    	parts = cinput.split()
+    	if len(parts) < 2:
+    		print("Please enter a URL/IP after 'ping'.")
+    	else:
+    		ping(parts[1])
     else:
         print("Command '" + cinput + "' does not exist.")
