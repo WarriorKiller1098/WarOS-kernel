@@ -5,9 +5,9 @@
 import time
 import os
 
-buildnum = 5
+buildnum = 10
 
-def boot():
+def boot(waiting):
 	print(" _    _            _____ _____ ")
 	print("| |  | |          |  _  /  ___|")
 	print("| |  | | __ _ _ __| | | \\ `--. ")
@@ -15,7 +15,9 @@ def boot():
 	print("\\  /\\  / (_| | |  \\ \\_/ /\\__/ /")
 	print(" \\/  \\/ \\__,_|_|   \\___/\\____/ ")
 	print("")
-	time.sleep(1.5)
+	print("Loading WarOS......")
+	if waiting == True:
+		time.sleep(1.5)
 	print("WarOS prototype " +
 	str(buildnum))
 	print("")
@@ -23,7 +25,7 @@ def boot():
 
 def color_blue():
 	print("\033[44m\033[97m\033[2J\033[H", end="")
-boot()
+boot(True)
 
 while True:
     cinput = input("kernel:>").strip()
@@ -41,7 +43,11 @@ while True:
     elif cinput == "help":
         print("'<>' stands for something you'll write.")
         print("Commands are:")
-        print("about, shutdown, print <>, panic <>, blue, clear <>")
+        print("about, shutdown, print <>, panic <>,")
+        print("color <>, clear <>, reset")
+        print("")
+        print("Updates:")
+        print("Blue command now is a argument in color command, in prototype 10")
     elif cinput.startswith("panic"):
         paniclog = cinput[len("panic"):]
         color_blue()
@@ -68,11 +74,26 @@ while True:
     	if "notime" not in args:
     		time.sleep(1)
     	os.system("cls" if os.name == "nt" else "clear")
-    	boot()
-    elif cinput == "blue":
-    	color_blue()
-    	print("Colored screen to blue.")
+    	boot(True)
+    elif cinput.startswith("color"):
+    	colorparts = cinput.split()
+    	args = colorparts[1:]
+    	if "blue" in args:
+    		color_blue()
+    		os.system("cls" if os.name == "nt" else "clear")
+    		boot(True)
+    		print("Colored screen to blue.")
+    	elif "--help" in args:
+    		print("Type 'color blue' to color it blue!")
+    		print("Also type 'reset' to reset color.")
+    		print("Old blue command is now a argument in color command.")
     elif cinput == "":
     	print("Nothing has been entered.")
+    elif cinput == "reset":
+    	print("\033[0m", end="")
+    	os.system("cls" if os.name == "nt" else "clear")
+    	boot(False)
+    	os.system("cls" if os.name == "nt" else "clear")
+    	boot(True)
     else:
-        print("Command " + cinput + " does not exist.")
+        print("Command '" + cinput + "' does not exist.")
